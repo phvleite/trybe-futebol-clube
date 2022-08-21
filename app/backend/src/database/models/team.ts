@@ -1,11 +1,9 @@
-import { DATE, INTEGER, Model, STRING } from 'sequelize';
+import { INTEGER, Model, STRING } from 'sequelize';
 import db from '.';
 
 class Team extends Model {
   id!: number;
   teamName!: string;
-  createdAt!: Date;
-  updatedAr!: Date;
 }
 
 Team.init({
@@ -17,14 +15,6 @@ Team.init({
   },
   teamName: {
     type: STRING,
-    allowNull: false,
-  },
-  createdAt: {
-    type: DATE,
-    allowNull: false,
-  },
-  updatedAt: {
-    type: DATE,
     allowNull: false,
   },
 }, {
