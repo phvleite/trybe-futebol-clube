@@ -1,13 +1,18 @@
 import User from '../database/models/user';
-// import { IUserService } from '../interfaces/IUserService';
+import { IUserService } from '../interfaces/IUserService';
 
-export interface IUserService {
-  list(): Promise<User[]>
-}
+export default class UserService implements IUserService {
+  private users: User[];
 
-export class UserService implements IUserService {
   async list(): Promise<User[]> {
-    const users: User[] = await User.findAll();
-    return users;
+    this.users = await User.findAll();
+    return this.users;
   }
 }
+
+// const userService = {
+//   list: async (): Promise<User[]> => {
+//     const users: User[] = await User.findAll();
+//     return users;
+//   },
+// };
