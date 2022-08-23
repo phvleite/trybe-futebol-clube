@@ -28,7 +28,7 @@ services:
         condition: service_healthy
     environment:
       - APP_PORT=3001
-      - JWT_SECRET=jwt_secret
+      - JWT_SECRET=egressusNumquamIterum
       # Os dados abaixo se referem ao container `db`
       # Dica: Relembre aqui da comunicação interna entre containers
       - DB_USER=root
