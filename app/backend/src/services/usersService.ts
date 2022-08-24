@@ -9,14 +9,14 @@ interface Payload {
 }
 
 export default class UserService implements IUserService {
-  private users: User[];
+  // private users: User[];
   private result: User | null;
   private comp: boolean;
 
-  async list(): Promise<User[]> {
-    this.users = await User.findAll();
-    return this.users;
-  }
+  // async list(): Promise<User[]> {
+  //   this.users = await User.findAll();
+  //   return this.users;
+  // }
 
   async checkIfExistEmail(email: string, password: string): Promise<object> {
     this.result = await User.findOne({ where: { email } });
@@ -26,7 +26,7 @@ export default class UserService implements IUserService {
     if (!this.result || !this.comp) {
       const error = new Error();
       error.name = 'UnauthorizedError';
-      error.message = 'Incorrect email ou password';
+      error.message = 'Incorrect email or password';
       throw error;
     }
 

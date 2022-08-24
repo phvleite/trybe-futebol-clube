@@ -7,7 +7,6 @@ const usersController = new UserController(userService);
 
 const usersRouter = Router();
 
-usersRouter.get('/users', (req, res) => usersController.list(req, res));
 usersRouter.post('/login', (req, res) => usersController.checkIfExistEmail(req, res));
 
 export default usersRouter;

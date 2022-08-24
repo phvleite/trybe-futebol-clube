@@ -18,9 +18,6 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
-const email: string ="teste@teste.com";
-const password: string = '123456789';
-
 const userMock: IUser = {
   id: 1,
   username: 'usernamemock',
@@ -34,11 +31,59 @@ describe('Post /login', () => {
     sinon.stub(User, 'findOne').resolves(userMock as User);
     sinon.stub(passwordService, 'comparePassword').resolves(true);
 
+    const email: string ="mockemail@mockemail.com";
+    const password: string = '123456789';
+
     const response = await chai.request(app).post('/login')
       .send({ email, password });
 
     expect(response.status).to.be.eq(200);
     expect(response.body).to.have.property('token');
+
+    sinon.restore();
+  });
+
+  it('ao se fazer um login sem email, deve retorna status 400 e uma mensagem de erro', async () => {
+    sinon.stub(User, 'findOne').resolves(userMock as User);
+    sinon.stub(passwordService, 'comparePassword').resolves(true);
+
+    const password: string = '123456789';
+
+    const response = await chai.request(app).post('/login')
+      .send({ password });
+
+    expect(response.status).to.be.eq(400);
+    expect(response.body).to.be.deep.eq({ "message": "All fields must be filled" });
+
+    sinon.restore();
+  });
+
+  it('ao se fazer um login com um email inválido, deve retorna status 401 e uma mensagem de erro', async () => {
+    sinon.stub(User, 'findOne').resolves(null);
+
+    const email: string ="mockemail.com";
+    const password: string = '123456789';
+
+    const response = await chai.request(app).post('/login')
+      .send({ email, password });
+
+    expect(response.status).to.be.eq(401);
+    expect(response.body).to.be.deep.eq({ "message": "Incorrect email or password" });
+
+    sinon.restore();
+  });
+
+  it('ao se fazer um login com uma senha inválida, deve retorna status 401 e uma mensagem de erro', async () => {
+    sinon.stub(User, 'findOne').resolves(null);
+
+    const email: string ="mockemail@mockemail.com";
+    const password: string = '123';
+
+    const response = await chai.request(app).post('/login')
+      .send({ email, password });
+
+    expect(response.status).to.be.eq(401);
+    expect(response.body).to.be.deep.eq({ "message": "Incorrect email or password" });
 
     sinon.restore();
   });
