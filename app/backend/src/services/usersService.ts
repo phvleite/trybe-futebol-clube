@@ -1,3 +1,4 @@
+import { JwtPayload } from 'jsonwebtoken';
 import User from '../database/models/user';
 import { IUserService } from '../interfaces/IUserService';
 import passwordService from './passwordService';
@@ -9,16 +10,11 @@ interface Payload {
 }
 
 export default class UserService implements IUserService {
-  // private users: User[];
   private result: User | null;
   private comp: boolean;
+  private data: string | JwtPayload;
 
-  // async list(): Promise<User[]> {
-  //   this.users = await User.findAll();
-  //   return this.users;
-  // }
-
-  async checkIfExistEmail(email: string, password: string): Promise<object> {
+  async login(email: string, password: string): Promise<object> {
     this.result = await User.findOne({ where: { email } });
 
     if (this.result) this.comp = passwordService.comparePassword(password, this.result.password);
@@ -38,5 +34,10 @@ export default class UserService implements IUserService {
     const token = JwtService.sign(payload);
 
     return { token };
+  }
+
+  loginValidate(authorization: string): string | JwtPayload {
+    this.data = JwtService.validateToken(authorization);
+    return this.data;
   }
 }

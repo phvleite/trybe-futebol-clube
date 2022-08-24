@@ -1,6 +1,8 @@
 // import User from '../database/models/user';
 
+import { JwtPayload } from 'jsonwebtoken';
+
 export interface IUserService {
-  // list(): Promise<User[]>
-  checkIfExistEmail(email: string, password: string): Promise<object>;
+  login(email: string, password: string): Promise<object>;
+  loginValidate(authorization: string): string | JwtPayload;
 }

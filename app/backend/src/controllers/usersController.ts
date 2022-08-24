@@ -4,7 +4,7 @@ import UserService from '../services/usersService';
 export default class UserController {
   constructor(private userService: UserService) { }
 
-  async checkIfExistEmail(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -14,7 +14,19 @@ export default class UserController {
       throw error;
     }
 
-    const result = await this.userService.checkIfExistEmail(email, password);
+    const result = await this.userService.login(email, password);
     res.status(200).json(result);
+  }
+
+  loginValidate(req: Request, res: Response): void {
+    const { authorization } = req.headers;
+    if (!authorization) {
+      const error = new Error();
+      error.name = 'UnauthorizedError';
+      error.message = 'Expired or invalid token';
+      throw error;
+    }
+    const data = this.userService.loginValidate(authorization);
+    res.status(200).json({ role: Object.values(data)[0] });
   }
 }

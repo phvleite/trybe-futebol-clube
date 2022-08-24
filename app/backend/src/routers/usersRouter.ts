@@ -7,6 +7,7 @@ const usersController = new UserController(userService);
 
 const usersRouter = Router();
 
-usersRouter.post('/login', (req, res) => usersController.checkIfExistEmail(req, res));
+usersRouter.post('/login', (req, res) => usersController.login(req, res));
+usersRouter.get('/login/validate', (req, res) => usersController.loginValidate(req, res));
 
 export default usersRouter;
