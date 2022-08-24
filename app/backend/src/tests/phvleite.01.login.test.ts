@@ -30,14 +30,14 @@ const userMock: IUser = {
 }
 
 describe('Post /login', () => {
-  it('ao enviar um email e senha, deve retorna status 201 e um token', async () => {
+  it('ao enviar um email e senha, deve retorna status 200 e um token', async () => {
     sinon.stub(User, 'findOne').resolves(userMock as User);
     sinon.stub(passwordService, 'comparePassword').resolves(true);
 
     const response = await chai.request(app).post('/login')
       .send({ email, password });
 
-    expect(response.status).to.be.eq(201);
+    expect(response.status).to.be.eq(200);
     expect(response.body).to.have.property('token');
 
     sinon.restore();

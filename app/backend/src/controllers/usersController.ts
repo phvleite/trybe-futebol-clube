@@ -12,6 +12,6 @@ export default class UserController {
   async checkIfExistEmail(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body;
     const result = await this.userService.checkIfExistEmail(email, password);
-    res.status(201).json(result);
+    res.status(200).json(result);
   }
 }
