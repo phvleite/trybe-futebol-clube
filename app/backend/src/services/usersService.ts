@@ -4,7 +4,7 @@ import passwordService from './passwordService';
 import JwtService from './jwtService';
 
 interface Payload {
-  id: number,
+  role: string,
   email: string,
 }
 
@@ -31,7 +31,7 @@ export default class UserService implements IUserService {
     }
 
     const payload: Payload = {
-      id: this.result.id,
+      role: this.result.role,
       email: this.result.email,
     };
 
