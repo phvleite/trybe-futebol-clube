@@ -113,16 +113,8 @@ describe('Get /login/validate', () => {
   });
 
   it('ao solicitar uma validação sem login, deve retorna status 401 e a mensagem "Expired or invalid token"', async () => {
-    const jwtSecret = String(process.env.JWT_SECRET);
-
     sinon.stub(User, 'findOne').resolves(userMock as User);
     sinon.stub(passwordService, 'comparePassword').resolves(true);
-
-    const email: string ="mockemail@mockemail.com";
-    const password: string = '123456789';
-
-    const response = await chai.request(app).post('/login')
-      .send({ email, password });
 
     const token = '';
 
