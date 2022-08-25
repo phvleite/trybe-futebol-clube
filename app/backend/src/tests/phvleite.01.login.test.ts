@@ -111,4 +111,28 @@ describe('Get /login/validate', () => {
 
     sinon.restore();
   });
+
+  it('ao solicitar uma validação sem login, deve retorna status 401 e a mensagem "Expired or invalid token"', async () => {
+    const jwtSecret = String(process.env.JWT_SECRET);
+
+    sinon.stub(User, 'findOne').resolves(userMock as User);
+    sinon.stub(passwordService, 'comparePassword').resolves(true);
+
+    const email: string ="mockemail@mockemail.com";
+    const password: string = '123456789';
+
+    const response = await chai.request(app).post('/login')
+      .send({ email, password });
+
+    const token = '';
+
+    const result = await chai.request(app)
+      .get('/login/validate')
+      .set('Authorization', token); ;
+
+    expect(result.status).to.be.eq(401);
+    expect(result.body).to.be.deep.eq({ "message": "Expired or invalid token" });
+
+    sinon.restore();
+  });
 })
