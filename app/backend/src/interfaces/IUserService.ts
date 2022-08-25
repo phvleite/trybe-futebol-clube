@@ -1,5 +1,3 @@
-// import User from '../database/models/user';
-
 import { JwtPayload } from 'jsonwebtoken';
 
 export interface IUserService {
