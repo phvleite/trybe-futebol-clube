@@ -1,18 +1,14 @@
-//import Sinon, * as sinon from 'sinon';
 import * as sinon from 'sinon';
 import * as chai from 'chai';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-// import Example from '../database/models/ExampleModel';
-
-// import { Response } from 'superagent';
-import { beforeEach } from 'mocha';
 import User from '../database/models/user';
 import { IUser } from '../interfaces/IUser';
-import JwtService from '../services/jwtService';
 import passwordService from '../services/passwordService'
+import * as jwt from 'jsonwebtoken';
+import 'dotenv';
 
 chai.use(chaiHttp);
 
@@ -84,6 +80,34 @@ describe('Post /login', () => {
 
     expect(response.status).to.be.eq(401);
     expect(response.body).to.be.deep.eq({ "message": "Incorrect email or password" });
+
+    sinon.restore();
+  });
+})
+
+describe('Get /login/validate', () => {
+  it('ao solicitar uma validação, deve retorna status 200 e a função do usuário', async () => {
+    const jwtSecret = String(process.env.JWT_SECRET);
+
+    sinon.stub(User, 'findOne').resolves(userMock as User);
+    sinon.stub(passwordService, 'comparePassword').resolves(true);
+
+    const email: string ="mockemail@mockemail.com";
+    const password: string = '123456789';
+
+    const response = await chai.request(app).post('/login')
+      .send({ email, password });
+
+    const token = response.body.token;
+
+    const result = await chai.request(app)
+      .get('/login/validate')
+      .set('Authorization', token); ;
+
+    const data = jwt.verify(token, jwtSecret);
+
+    expect(result.status).to.be.eq(200);
+    expect(data).to.be.have.property('role');
 
     sinon.restore();
   });
