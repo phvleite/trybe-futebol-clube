@@ -106,7 +106,7 @@ describe('Get /teams/:id', () => {
     expect(message).to.be.deep.eq('"id" must be greater than or equal to 1');
   });
 
-  it('se informado uma letra para iddeve retorna status igual a 400 e a mensagem ""id" must be a number"', async () => {
+  it('se informado uma letra para id deve retorna status igual a 400 e a mensagem ""id" must be a number"', async () => {
     const teamId = 'a';
     const response = await chai.request(app).get('/teams/' + teamId);
 
