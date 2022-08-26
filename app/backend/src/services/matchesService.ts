@@ -13,4 +13,15 @@ export default class MatchService {
     });
     return this.matches;
   }
+
+  async listByQuery(progress: boolean): Promise<Match[]> {
+    this.matches = await Match.findAll({
+      where: { inProgress: progress },
+      include: [
+        { model: Team, as: 'teamHome', attributes: { exclude: ['id'] } },
+        { model: Team, as: 'teamAway', attributes: { exclude: ['id'] } },
+      ],
+    });
+    return this.matches;
+  }
 }

@@ -29,7 +29,7 @@ export default class TeamService implements ITeamService {
   }
 
   async getTeamById(id: number): Promise<Team> {
-    this.team = await Team.findOne({ where: { id } });
+    this.team = await Team.findByPk(id);
 
     if (!this.team) {
       const error = new Error();
