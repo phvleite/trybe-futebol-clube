@@ -40,4 +40,15 @@ export default class TeamService implements ITeamService {
 
     return this.team;
   }
+
+  async checkIfExistId(id: number): Promise<void> {
+    this.team = await Team.findByPk(id);
+
+    if (!this.team) {
+      const error = new Error();
+      error.name = 'NotFoundError';
+      error.message = 'There is no team with such id!';
+      throw error;
+    }
+  }
 }

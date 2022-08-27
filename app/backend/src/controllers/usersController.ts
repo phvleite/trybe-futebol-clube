@@ -23,7 +23,7 @@ export default class UserController {
     if (!authorization) {
       const error = new Error();
       error.name = 'UnauthorizedError';
-      error.message = 'Expired or invalid token';
+      error.message = 'Token must be a valid token';
       throw error;
     }
     const data = this.userService.loginValidate(authorization);
