@@ -32,12 +32,18 @@ interface IUpdateNewGoalsMatch {
   awayTeamGoals: number;
 }
 
+interface IFinishedMatch {
+  id: number;
+  inProgress: boolean;
+}
+
 export default class MatchService {
   private matches: Match[] | null;
   private match: Match | null;
   private schema: Joi.ObjectSchema<unknown>;
   private _homeTeam: number;
   private _awayTeam: number;
+  private _dataFinish: IFinishedMatch;
 
   validateParamsId(id: unknown): IValidateMatchId {
     this.schema = Joi.object({
@@ -140,5 +146,14 @@ export default class MatchService {
       ],
     });
     return this.match as Match;
+  }
+
+  async finished(data: IFinishedMatch): Promise<void> {
+    this._dataFinish = data;
+    const { inProgress, id } = this._dataFinish;
+    await Match.update(
+      { inProgress },
+      { where: { id } },
+    );
   }
 }

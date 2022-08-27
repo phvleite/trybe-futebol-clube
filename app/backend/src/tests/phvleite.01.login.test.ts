@@ -123,7 +123,7 @@ describe('Get /login/validate', () => {
       .set('Authorization', token); ;
 
     expect(result.status).to.be.eq(401);
-    expect(result.body).to.be.deep.eq({ "message": "Expired or invalid token" });
+    expect(result.body).to.be.deep.eq({ "message": "Token must be a valid token" });
 
     sinon.restore();
   });
