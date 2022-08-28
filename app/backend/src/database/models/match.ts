@@ -9,8 +9,6 @@ class Match extends Model {
   awayTeam!: Team;
   awayTeamGoals!: number;
   inProgress!: boolean;
-  createdAt!: Date;
-  updatedAr!: Date;
 }
 
 Match.init({
