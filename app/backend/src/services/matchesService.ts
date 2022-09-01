@@ -7,6 +7,7 @@ interface IValidateNewMatch {
   awayTeam: number;
   homeTeamGoals: number;
   awayTeamGoals: number;
+  inProgress: boolean;
 }
 
 interface INewMatch extends IValidateNewMatch {
@@ -63,6 +64,7 @@ export default class MatchService {
       awayTeam: Joi.number().required().min(1).integer(),
       homeTeamGoals: Joi.number().required().min(0).integer(),
       awayTeamGoals: Joi.number().required().min(0).integer(),
+      inProgress: Joi.bool().optional(),
     });
 
     const { error, value } = this.schema.validate(data);

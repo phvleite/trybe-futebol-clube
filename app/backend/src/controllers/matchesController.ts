@@ -9,66 +9,67 @@ export default class MatchController {
   private data: string | JwtPayload;
   private teamService = new TeamService();
 
-  constructor(private matcheService: MatchService) { }
+  constructor(private matchService: MatchService) { }
 
   async list(req: Request, res: Response): Promise<void> {
     const { inProgress } = req.query;
     let result;
     if (!inProgress) {
-      result = await this.matcheService.list();
+      result = await this.matchService.list();
     } else {
       if (inProgress === 'true') {
         this.progress = true;
       } else {
         this.progress = false;
       }
-      result = await this.matcheService.listByQuery(this.progress);
+      result = await this.matchService.listByQuery(this.progress);
     }
     res.status(200).json(result);
   }
 
   async create(req: Request, res: Response): Promise<void> {
     const { authorization } = req.headers;
-    const {
-      homeTeam,
-      awayTeam, homeTeamGoals, awayTeamGoals } = this.matcheService.validateBodyNewMatch(req.body);
-    this.matcheService.validatesTeamsOfNewMatch(homeTeam, awayTeam);
+    const dbNewMatch = this.matchService.validateBodyNewMatch({ ...req.body, inProgress: true });
+    // const { homeTeam,
+    //   awayTeam, homeTeamGoals, awayTeamGoals, inProgress } = this.matcheService
+    //   .validateBodyNewMatch(dbNewMatch);
+    this.matchService.validatesTeamsOfNewMatch(dbNewMatch.homeTeam, dbNewMatch.awayTeam);
     const authValidate = JwtService.validateAuthorization(authorization);
     this.data = JwtService.validateToken(authValidate);
-    await this.teamService.checkIfExistId(homeTeam);
-    await this.teamService.checkIfExistId(awayTeam);
-    const dataNewMatch = {
-      homeTeam,
-      homeTeamGoals,
-      awayTeam,
-      awayTeamGoals,
-      inProgress: true };
-    const newMatch = await this.matcheService.create(dataNewMatch);
+    await this.teamService.checkIfExistId(dbNewMatch.homeTeam);
+    await this.teamService.checkIfExistId(dbNewMatch.awayTeam);
+    // const dataNewMatch = {
+    //   homeTeam,
+    //   homeTeamGoals,
+    //   awayTeam,
+    //   awayTeamGoals,
+    //   inProgress };
+    const newMatch = await this.matchService.create(dbNewMatch);
     res.status(201).json(newMatch);
   }
 
   async update(req: Request, res: Response): Promise<void> {
     const { authorization } = req.headers;
-    const { id } = this.matcheService.validateParamsId(req.params);
-    this.matcheService.checkIfExistId(id);
-    const { homeTeamGoals, awayTeamGoals } = this.matcheService.validateBodyNewGoalsMatch(req.body);
+    const { id } = this.matchService.validateParamsId(req.params);
+    this.matchService.checkIfExistId(id);
+    const { homeTeamGoals, awayTeamGoals } = this.matchService.validateBodyNewGoalsMatch(req.body);
     const authValidate = JwtService.validateAuthorization(authorization);
     this.data = JwtService.validateToken(authValidate);
     const dataNewGoalsMacth = {
       homeTeamGoals, awayTeamGoals, id };
-    const newGoalsMatch = await this.matcheService.update(dataNewGoalsMacth);
+    const newGoalsMatch = await this.matchService.update(dataNewGoalsMacth);
     res.status(200).json(newGoalsMatch);
   }
 
   async finished(req: Request, res: Response): Promise<void> {
     const { authorization } = req.headers;
-    const { id } = this.matcheService.validateParamsId(req.params);
-    this.matcheService.checkIfExistId(id);
+    const { id } = this.matchService.validateParamsId(req.params);
+    this.matchService.checkIfExistId(id);
     const authValidate = JwtService.validateAuthorization(authorization);
     this.data = JwtService.validateToken(authValidate);
     const dataNewGoalsMacth = {
       inProgress: false, id };
-    await this.matcheService.finished(dataNewGoalsMacth);
+    await this.matchService.finished(dataNewGoalsMacth);
     res.status(200).json({ message: 'Finished' });
   }
 }
