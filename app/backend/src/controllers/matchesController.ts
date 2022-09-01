@@ -30,20 +30,11 @@ export default class MatchController {
   async create(req: Request, res: Response): Promise<void> {
     const { authorization } = req.headers;
     const dbNewMatch = this.matchService.validateBodyNewMatch({ ...req.body, inProgress: true });
-    // const { homeTeam,
-    //   awayTeam, homeTeamGoals, awayTeamGoals, inProgress } = this.matcheService
-    //   .validateBodyNewMatch(dbNewMatch);
     this.matchService.validatesTeamsOfNewMatch(dbNewMatch.homeTeam, dbNewMatch.awayTeam);
     const authValidate = JwtService.validateAuthorization(authorization);
     this.data = JwtService.validateToken(authValidate);
     await this.teamService.checkIfExistId(dbNewMatch.homeTeam);
     await this.teamService.checkIfExistId(dbNewMatch.awayTeam);
-    // const dataNewMatch = {
-    //   homeTeam,
-    //   homeTeamGoals,
-    //   awayTeam,
-    //   awayTeamGoals,
-    //   inProgress };
     const newMatch = await this.matchService.create(dbNewMatch);
     res.status(201).json(newMatch);
   }
@@ -67,6 +58,7 @@ export default class MatchController {
     this.matchService.checkIfExistId(id);
     const authValidate = JwtService.validateAuthorization(authorization);
     this.data = JwtService.validateToken(authValidate);
+    console.log(this.data);
     const dataNewGoalsMacth = {
       inProgress: false, id };
     await this.matchService.finished(dataNewGoalsMacth);

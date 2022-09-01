@@ -20,39 +20,33 @@ interface IBDRank {
   ag: number;
 }
 
-export default class Classification {
-  private teams: Team[];
-  private matches: Match[];
-  private data: IBDRank[];
-  private result: IClassification;
+const classification = {
 
-  rank(teams: Team[], matches: Match[]): IClassification[] {
+  rank: (teams: Team[], matches: Match[]): IClassification[] => {
     const dbRank: IBDRank[] = [];
     const dbResult: IClassification[] = [];
-    this.teams = teams;
-    this.matches = matches;
-    this.teams.forEach((team) => {
-      this.matches.forEach((match) => {
+    teams.forEach((team) => {
+      matches.forEach((match) => {
         if (Number(team.id) === Number(match.homeTeam)) {
           dbRank.push({ name: team.teamName, hg: match.homeTeamGoals, ag: match.awayTeamGoals });
         }
       });
-      const result = this.rankCalculate(dbRank);
+      const result = classification.rankCalculate(dbRank);
       dbResult.push(result);
       dbRank.splice(0, dbRank.length);
     });
-    return dbResult;
-  }
+    const boardResult: IClassification[] = classification.leaderboard(dbResult);
+    return boardResult;
+  },
 
-  rankCalculate(data: IBDRank[]): IClassification {
-    this.data = data;
-    const J = this.data.length; let P = 0; let V = 0; let E = 0; let D = 0; let GP = 0; let GC = 0;
-    this.data.forEach((match) => {
+  rankCalculate: (data: IBDRank[]): IClassification => {
+    const J = data.length; let P = 0; let V = 0; let E = 0; let D = 0; let GP = 0; let GC = 0;
+    data.forEach((match) => {
       if (match.hg > match.ag) { P += 3; V += 1; GP += match.hg; GC += match.ag; }
       if (match.hg < match.ag) { D += 1; GP += match.hg; GC += match.ag; }
       if (match.hg === match.ag) { P += 1; E += 1; GP += match.hg; GC += match.ag; }
     });
-    this.result = { name: this.data[0].name,
+    const result = { name: data[0].name,
       totalPoints: P,
       totalGames: J,
       totalVictories: V,
@@ -62,6 +56,30 @@ export default class Classification {
       goalsOwn: GC,
       goalsBalance: GP - GC,
       efficiency: Number(((P / (J * 3)) * 100).toFixed(2)) };
-    return this.result;
-  }
-}
+    return result;
+  },
+
+  leaderboard: (board: IClassification[]): IClassification[] => {
+    board.sort((team1, team2): number => {
+      if (team1.totalPoints > team2.totalPoints) return -1;
+      if (team1.totalPoints < team2.totalPoints) return 1;
+
+      if (team1.totalVictories > team2.totalVictories) return -1;
+      if (team1.totalVictories < team2.totalVictories) return 1;
+
+      if (team1.goalsBalance > team2.goalsBalance) return -1;
+      if (team1.goalsBalance < team2.goalsBalance) return 1;
+
+      if (team1.goalsFavor > team2.goalsFavor) return -1;
+      if (team1.goalsFavor < team2.goalsFavor) return 1;
+
+      if (team1.goalsOwn > team2.goalsOwn) return -1;
+      if (team1.goalsOwn < team2.goalsOwn) return 1;
+
+      return 0;
+    });
+    return board;
+  },
+};
+
+export default classification;
