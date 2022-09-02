@@ -10,6 +10,14 @@ export default class LeaderboardController {
   private macthService = new MatchService();
   private classification = new Classification();
 
+  async list(_req: Request, res: Response): Promise<void> {
+    const teams = await this.teamService.list();
+    const inProgress = false;
+    const matches = await this.macthService.listByQuery(inProgress);
+    const result = this.classification.rank(teams, matches);
+    res.status(200).json(result);
+  }
+
   async listHome(_req: Request, res: Response): Promise<void> {
     const teams = await this.teamService.list();
     const inProgress = false;

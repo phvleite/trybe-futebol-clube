@@ -57,8 +57,7 @@ export default class MatchController {
     const { id } = this.matchService.validateParamsId(req.params);
     this.matchService.checkIfExistId(id);
     const authValidate = JwtService.validateAuthorization(authorization);
-    this.data = JwtService.validateToken(authValidate);
-    console.log(this.data);
+    JwtService.validateToken(authValidate);
     const dataNewGoalsMacth = {
       inProgress: false, id };
     await this.matchService.finished(dataNewGoalsMacth);
