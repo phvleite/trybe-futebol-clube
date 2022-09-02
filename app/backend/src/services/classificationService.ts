@@ -20,33 +20,56 @@ interface IBDRank {
   ag: number;
 }
 
-const classification = {
+export default class Classification {
+  private teams: Team[];
+  private matches: Match[];
+  private data: IBDRank[];
+  private result: IClassification;
+  private board: IClassification[];
 
-  rank: (teams: Team[], matches: Match[]): IClassification[] => {
+  rankHome(teams: Team[], matches: Match[]): IClassification[] {
     const dbRank: IBDRank[] = [];
     const dbResult: IClassification[] = [];
-    teams.forEach((team) => {
-      matches.forEach((match) => {
+    this.teams = teams; this.matches = matches;
+    this.teams.forEach((team) => {
+      this.matches.forEach((match) => {
         if (Number(team.id) === Number(match.homeTeam)) {
           dbRank.push({ name: team.teamName, hg: match.homeTeamGoals, ag: match.awayTeamGoals });
         }
       });
-      const result = classification.rankCalculate(dbRank);
+      const result = this.rankCalculateHome(dbRank);
       dbResult.push(result);
       dbRank.splice(0, dbRank.length);
     });
-    const boardResult: IClassification[] = classification.leaderboard(dbResult);
-    return boardResult;
-  },
+    return this.leaderboard(dbResult);
+  }
 
-  rankCalculate: (data: IBDRank[]): IClassification => {
-    const J = data.length; let P = 0; let V = 0; let E = 0; let D = 0; let GP = 0; let GC = 0;
-    data.forEach((match) => {
+  rankAway(teams: Team[], matches: Match[]): IClassification[] {
+    const dbRank: IBDRank[] = [];
+    const dbResult: IClassification[] = [];
+    this.teams = teams; this.matches = matches;
+    this.teams.forEach((team) => {
+      this.matches.forEach((match) => {
+        if (Number(team.id) === Number(match.awayTeam)) {
+          dbRank.push({ name: team.teamName, hg: match.homeTeamGoals, ag: match.awayTeamGoals });
+        }
+      });
+      const result = this.rankCalculateAway(dbRank);
+      dbResult.push(result);
+      dbRank.splice(0, dbRank.length);
+    });
+    return this.leaderboard(dbResult);
+  }
+
+  rankCalculateHome(data: IBDRank[]): IClassification {
+    this.data = data;
+    const J = this.data.length; let P = 0; let V = 0; let E = 0; let D = 0; let GP = 0; let GC = 0;
+    this.data.forEach((match) => {
       if (match.hg > match.ag) { P += 3; V += 1; GP += match.hg; GC += match.ag; }
       if (match.hg < match.ag) { D += 1; GP += match.hg; GC += match.ag; }
       if (match.hg === match.ag) { P += 1; E += 1; GP += match.hg; GC += match.ag; }
     });
-    const result = { name: data[0].name,
+    this.result = { name: this.data[0].name,
       totalPoints: P,
       totalGames: J,
       totalVictories: V,
@@ -56,11 +79,33 @@ const classification = {
       goalsOwn: GC,
       goalsBalance: GP - GC,
       efficiency: Number(((P / (J * 3)) * 100).toFixed(2)) };
-    return result;
-  },
+    return this.result;
+  }
 
-  leaderboard: (board: IClassification[]): IClassification[] => {
-    board.sort((team1, team2): number => {
+  rankCalculateAway(data: IBDRank[]): IClassification {
+    this.data = data;
+    const J = this.data.length; let P = 0; let V = 0; let E = 0; let D = 0; let GP = 0; let GC = 0;
+    this.data.forEach((match) => {
+      if (match.ag > match.hg) { P += 3; V += 1; GP += match.ag; GC += match.hg; }
+      if (match.ag < match.hg) { D += 1; GP += match.ag; GC += match.hg; }
+      if (match.ag === match.hg) { P += 1; E += 1; GP += match.ag; GC += match.hg; }
+    });
+    this.result = { name: this.data[0].name,
+      totalPoints: P,
+      totalGames: J,
+      totalVictories: V,
+      totalDraws: E,
+      totalLosses: D,
+      goalsFavor: GP,
+      goalsOwn: GC,
+      goalsBalance: GP - GC,
+      efficiency: Number(((P / (J * 3)) * 100).toFixed(2)) };
+    return this.result;
+  }
+
+  leaderboard(board: IClassification[]): IClassification[] {
+    this.board = board;
+    this.board.sort((team1: IClassification, team2: IClassification): number => {
       if (team1.totalPoints > team2.totalPoints) return -1;
       if (team1.totalPoints < team2.totalPoints) return 1;
 
@@ -78,8 +123,6 @@ const classification = {
 
       return 0;
     });
-    return board;
-  },
-};
-
-export default classification;
+    return this.board;
+  }
+}
